@@ -1,5 +1,5 @@
 use crate::base::errors::Error;
-use crate::base::events::emit_autoshare_created;
+// use crate::base::events::emit_autoshare_created; // Deprecated - TODO: migrate to #[contractevent]
 use crate::base::types::{AutoShareDetails, GroupMember, PaymentHistory};
 use soroban_sdk::{contracttype, token, Address, BytesN, Env, String, Vec};
 
@@ -48,7 +48,7 @@ pub fn create_autoshare(
 
     // Transfer tokens from creator to contract
     let token_client = token::Client::new(&env, &payment_token);
-    token_client.transfer(&creator, &env.current_contract_address(), &total_cost);
+    token_client.transfer(&creator, env.current_contract_address(), &total_cost);
 
     let details = AutoShareDetails {
         id: id.clone(),
@@ -77,10 +77,16 @@ pub fn create_autoshare(
     env.storage().persistent().set(&members_key, &empty_members);
 
     // Record payment history
-    record_payment(env.clone(), creator.clone(), id.clone(), usage_count, total_cost);
+    record_payment(
+        env.clone(),
+        creator.clone(),
+        id.clone(),
+        usage_count,
+        total_cost,
+    );
 
-    // Emit the success event
-    emit_autoshare_created(&env, id, creator);
+    // TODO: Migrate to #[contractevent] macro instead of deprecated publish method
+    // emit_autoshare_created(&env, id, creator);
     Ok(())
 }
 
@@ -311,10 +317,7 @@ pub fn set_usage_fee(env: Env, fee: u32, admin: Address) -> Result<(), Error> {
 
 pub fn get_usage_fee(env: Env) -> u32 {
     let fee_key = DataKey::UsageFee;
-    env.storage()
-        .persistent()
-        .get(&fee_key)
-        .unwrap_or(10u32)
+    env.storage().persistent().get(&fee_key).unwrap_or(10u32)
 }
 
 // ============================================================================
@@ -354,7 +357,7 @@ pub fn topup_subscription(
 
     // Transfer tokens from payer to contract
     let token_client = token::Client::new(&env, &payment_token);
-    token_client.transfer(&payer, &env.current_contract_address(), &total_cost);
+    token_client.transfer(&payer, env.current_contract_address(), &total_cost);
 
     // Update usage counts
     details.usage_count += additional_usages;

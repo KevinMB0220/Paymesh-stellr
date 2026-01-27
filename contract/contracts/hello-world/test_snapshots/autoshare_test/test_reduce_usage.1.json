@@ -1,6 +1,6 @@
 {
   "generators": {
-    "address": 8,
+    "address": 5,
     "nonce": 0,
     "mux_id": 0
   },
@@ -101,13 +101,13 @@
                   "bytes": "0101010101010101010101010101010101010101010101010101010101010101"
                 },
                 {
-                  "string": "Test Group"
+                  "string": "Paid Group"
                 },
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK3IM"
                 },
                 {
-                  "u32": 100
+                  "u32": 10
                 },
                 {
                   "address": "CCABDO7UZXYE4W6GVSEGSNNZTKSLFQGKXXQTH6OX7M7GKZ4Z6CUJNGZN"
@@ -129,7 +129,7 @@
                       "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2KM"
                     },
                     {
-                      "i128": "1000"
+                      "i128": "100"
                     }
                   ]
                 }
@@ -140,7 +140,6 @@
         }
       ]
     ],
-    [],
     [],
     [],
     []
@@ -356,7 +355,7 @@
                         "symbol": "name"
                       },
                       "val": {
-                        "string": "Test Group"
+                        "string": "Paid Group"
                       }
                     },
                     {
@@ -364,7 +363,7 @@
                         "symbol": "total_usages_paid"
                       },
                       "val": {
-                        "u32": 100
+                        "u32": 10
                       }
                     },
                     {
@@ -372,7 +371,7 @@
                         "symbol": "usage_count"
                       },
                       "val": {
-                        "u32": 100
+                        "u32": 9
                       }
                     }
                   ]
@@ -420,44 +419,7 @@
                 },
                 "durability": "persistent",
                 "val": {
-                  "vec": [
-                    {
-                      "map": [
-                        {
-                          "key": {
-                            "symbol": "address"
-                          },
-                          "val": {
-                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDR4"
-                          }
-                        }
-                      ]
-                    },
-                    {
-                      "map": [
-                        {
-                          "key": {
-                            "symbol": "address"
-                          },
-                          "val": {
-                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
-                          }
-                        }
-                      ]
-                    },
-                    {
-                      "map": [
-                        {
-                          "key": {
-                            "symbol": "address"
-                          },
-                          "val": {
-                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARQG5"
-                          }
-                        }
-                      ]
-                    }
-                  ]
+                  "vec": []
                 }
               }
             },
@@ -510,7 +472,7 @@
                             "symbol": "amount_paid"
                           },
                           "val": {
-                            "i128": "1000"
+                            "i128": "100"
                           }
                         },
                         {
@@ -534,7 +496,7 @@
                             "symbol": "usages_purchased"
                           },
                           "val": {
-                            "u32": 100
+                            "u32": 10
                           }
                         },
                         {
@@ -682,7 +644,7 @@
                             "symbol": "amount_paid"
                           },
                           "val": {
-                            "i128": "1000"
+                            "i128": "100"
                           }
                         },
                         {
@@ -706,7 +668,7 @@
                             "symbol": "usages_purchased"
                           },
                           "val": {
-                            "u32": 100
+                            "u32": 10
                           }
                         },
                         {
@@ -934,7 +896,7 @@
                         "symbol": "amount"
                       },
                       "val": {
-                        "i128": "1000"
+                        "i128": "100"
                       }
                     },
                     {
@@ -1004,7 +966,7 @@
                         "symbol": "amount"
                       },
                       "val": {
-                        "i128": "9999000"
+                        "i128": "9999900"
                       }
                     },
                     {
