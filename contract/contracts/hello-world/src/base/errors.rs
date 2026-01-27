@@ -12,4 +12,6 @@ pub enum Error {
     NoUsagesRemaining = 6,
     InvalidUsageCount = 7,
     Unauthorized = 8,
+    InsufficientBalance = 4,
+    InvalidAmount = 5,
 }

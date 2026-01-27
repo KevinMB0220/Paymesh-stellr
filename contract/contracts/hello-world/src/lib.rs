@@ -170,3 +170,9 @@ impl AutoShareContract {
 #[cfg(test)]
 #[path = "tests/autoshare_test.rs"]
 mod autoshare_test; // Links the internal tests/autoshare_test.rs inside src
+
+pub mod mock_token;
+
+#[cfg(test)]
+#[path = "tests/mock_token_test.rs"]
+mod mock_token_test;
