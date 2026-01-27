@@ -7,4 +7,9 @@ pub enum Error {
     InvalidInput = 1,
     AlreadyExists = 2,
     NotFound = 3,
+    UnsupportedToken = 4,
+    InsufficientPayment = 5,
+    NoUsagesRemaining = 6,
+    InvalidUsageCount = 7,
+    Unauthorized = 8,
 }
