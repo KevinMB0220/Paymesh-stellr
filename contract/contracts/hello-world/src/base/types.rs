@@ -1,4 +1,4 @@
-use soroban_sdk::{contracttype, Address, BytesN, String};
+use soroban_sdk::{contracttype, Address, BytesN, String, Vec};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -8,12 +8,15 @@ pub struct AutoShareDetails {
     pub creator: Address,
     pub usage_count: u32,
     pub total_usages_paid: u32,
+    pub members: Vec<GroupMember>,
+    pub is_active: bool,
 }
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct GroupMember {
     pub address: Address,
+    pub percentage: u32,
 }
 
 #[contracttype]

@@ -1,5 +1,8 @@
 use crate::base::errors::Error;
-// use crate::base::events::emit_autoshare_created; // Deprecated - TODO: migrate to #[contractevent]
+use crate::base::events::{
+    emit_autoshare_updated, emit_contract_paused, emit_contract_unpaused,
+    emit_group_activated, emit_group_deactivated,
+};
 use crate::base::types::{AutoShareDetails, GroupMember, PaymentHistory};
 use soroban_sdk::{contracttype, token, Address, BytesN, Env, String, Vec};
 
@@ -13,6 +16,7 @@ pub enum DataKey {
     UsageFee,
     UserPaymentHistory(Address),
     GroupPaymentHistory(BytesN<32>),
+    IsPaused,
 }
 
 pub fn create_autoshare(
@@ -56,6 +60,8 @@ pub fn create_autoshare(
         creator: creator.clone(),
         usage_count,
         total_usages_paid: usage_count,
+        members: Vec::new(&env),
+        is_active: true,
     };
 
     // Store the details in persistent storage
@@ -163,7 +169,7 @@ pub fn get_group_members(env: Env, id: BytesN<32>) -> Result<Vec<GroupMember>, E
     Ok(members)
 }
 
-pub fn add_group_member(env: Env, id: BytesN<32>, address: Address) -> Result<(), Error> {
+pub fn add_group_member(env: Env, id: BytesN<32>, address: Address, percentage: u32) -> Result<(), Error> {
     // First check if the group exists
     let group_key = DataKey::AutoShare(id.clone());
     if !env.storage().persistent().has(&group_key) {
@@ -184,7 +190,7 @@ pub fn add_group_member(env: Env, id: BytesN<32>, address: Address) -> Result<()
         }
     }
 
-    members.push_back(GroupMember { address });
+    members.push_back(GroupMember { address, percentage });
     env.storage().persistent().set(&members_key, &members);
     Ok(())
 }
@@ -225,6 +231,47 @@ fn require_admin(env: &Env, caller: &Address) -> Result<(), Error> {
     }
 
     Ok(())
+}
+
+// ============================================================================
+// Pause Management
+// ============================================================================
+
+pub fn pause(env: Env, admin: Address) -> Result<(), Error> {
+    admin.require_auth();
+    require_admin(&env, &admin)?;
+
+    let pause_key = DataKey::IsPaused;
+    let is_paused: bool = env.storage().persistent().get(&pause_key).unwrap_or(false);
+
+    if is_paused {
+        return Err(Error::AlreadyPaused);
+    }
+
+    env.storage().persistent().set(&pause_key, &true);
+    emit_contract_paused(&env);
+    Ok(())
+}
+
+pub fn unpause(env: Env, admin: Address) -> Result<(), Error> {
+    admin.require_auth();
+    require_admin(&env, &admin)?;
+
+    let pause_key = DataKey::IsPaused;
+    let is_paused: bool = env.storage().persistent().get(&pause_key).unwrap_or(false);
+
+    if !is_paused {
+        return Err(Error::NotPaused);
+    }
+
+    env.storage().persistent().set(&pause_key, &false);
+    emit_contract_unpaused(&env);
+    Ok(())
+}
+
+pub fn get_paused_status(env: &Env) -> bool {
+    let pause_key = DataKey::IsPaused;
+    env.storage().persistent().get(&pause_key).unwrap_or(false)
 }
 
 // ============================================================================
@@ -473,4 +520,122 @@ pub fn reduce_usage(env: Env, id: BytesN<32>) -> Result<(), Error> {
     details.usage_count -= 1;
     env.storage().persistent().set(&key, &details);
     Ok(())
+}
+
+// ============================================================================
+// Group Activation Management
+// ============================================================================
+
+pub fn update_members(
+    env: Env,
+    id: BytesN<32>,
+    caller: Address,
+    new_members: Vec<GroupMember>,
+) -> Result<(), Error> {
+    caller.require_auth();
+
+    let key = DataKey::AutoShare(id.clone());
+    let mut details: AutoShareDetails = env
+        .storage()
+        .persistent()
+        .get(&key)
+        .ok_or(Error::NotFound)?;
+
+    if details.creator != caller {
+        return Err(Error::Unauthorized);
+    }
+
+    // Validate new members
+    if new_members.is_empty() {
+        return Err(Error::EmptyMembers);
+    }
+
+    let mut total_percentage: u32 = 0;
+    let mut seen_addresses = Vec::new(&env);
+
+    for member in new_members.iter() {
+        total_percentage += member.percentage;
+
+        for seen in seen_addresses.iter() {
+            if seen == member.address {
+                return Err(Error::DuplicateMember);
+            }
+        }
+        seen_addresses.push_back(member.address.clone());
+    }
+
+    if total_percentage != 100 {
+        return Err(Error::InvalidTotalPercentage);
+    }
+
+    // Update members in details
+    details.members = new_members.clone();
+    env.storage().persistent().set(&key, &details);
+
+    // Also update the GroupMembers storage
+    let members_key = DataKey::GroupMembers(id.clone());
+    env.storage().persistent().set(&members_key, &new_members);
+
+    emit_autoshare_updated(&env, id, caller);
+    Ok(())
+}
+
+pub fn deactivate_group(env: Env, id: BytesN<32>, caller: Address) -> Result<(), Error> {
+    caller.require_auth();
+
+    let key = DataKey::AutoShare(id.clone());
+    let mut details: AutoShareDetails = env
+        .storage()
+        .persistent()
+        .get(&key)
+        .ok_or(Error::NotFound)?;
+
+    if details.creator != caller {
+        return Err(Error::Unauthorized);
+    }
+
+    if !details.is_active {
+        return Err(Error::GroupAlreadyInactive);
+    }
+
+    details.is_active = false;
+    env.storage().persistent().set(&key, &details);
+
+    emit_group_deactivated(&env, id, caller);
+    Ok(())
+}
+
+pub fn activate_group(env: Env, id: BytesN<32>, caller: Address) -> Result<(), Error> {
+    caller.require_auth();
+
+    let key = DataKey::AutoShare(id.clone());
+    let mut details: AutoShareDetails = env
+        .storage()
+        .persistent()
+        .get(&key)
+        .ok_or(Error::NotFound)?;
+
+    if details.creator != caller {
+        return Err(Error::Unauthorized);
+    }
+
+    if details.is_active {
+        return Err(Error::GroupAlreadyActive);
+    }
+
+    details.is_active = true;
+    env.storage().persistent().set(&key, &details);
+
+    emit_group_activated(&env, id, caller);
+    Ok(())
+}
+
+pub fn is_group_active(env: Env, id: BytesN<32>) -> Result<bool, Error> {
+    let key = DataKey::AutoShare(id);
+    let details: AutoShareDetails = env
+        .storage()
+        .persistent()
+        .get(&key)
+        .ok_or(Error::NotFound)?;
+    Ok(details.is_active)
 }
