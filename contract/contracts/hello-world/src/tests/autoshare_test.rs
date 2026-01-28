@@ -198,7 +198,7 @@ fn test_is_group_member_true() {
 
     token_admin_client.mint(&creator, &10000000);
     client.create(&id, &name, &creator, &100u32, &token_address);
-    client.add_group_member(&id, &member);
+    client.add_group_member(&id, &member, &25u32);
 
     let is_member = client.is_group_member(&id, &member);
     assert!(is_member);
@@ -243,9 +243,9 @@ fn test_get_group_members_multiple() {
 
     token_admin_client.mint(&creator, &10000000);
     client.create(&id, &name, &creator, &100u32, &token_address);
-    client.add_group_member(&id, &member1);
-    client.add_group_member(&id, &member2);
-    client.add_group_member(&id, &member3);
+    client.add_group_member(&id, &member1, &33u32);
+    client.add_group_member(&id, &member2, &33u32);
+    client.add_group_member(&id, &member3, &34u32);
 
     let members = client.get_group_members(&id);
     assert_eq!(members.len(), 3);
@@ -270,7 +270,7 @@ fn test_add_member_to_non_existent_group() {
 
     let member = Address::generate(&env);
     let id = BytesN::from_array(&env, &[99u8; 32]);
-    client.add_group_member(&id, &member);
+    client.add_group_member(&id, &member, &25u32);
 }
 
 #[test]
@@ -284,8 +284,8 @@ fn test_add_duplicate_member() {
     let name = String::from_str(&env, "Test Group");
 
     client.create(&id, &name, &creator, &100u32, &token_address);
-    client.add_group_member(&id, &member);
-    client.add_group_member(&id, &member);
+    client.add_group_member(&id, &member, &25u32);
+    client.add_group_member(&id, &member, &25u32);
 }
 
 // ============================================================================

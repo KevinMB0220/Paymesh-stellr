@@ -372,6 +372,22 @@
                     },
                     {
                       "key": {
+                        "symbol": "is_active"
+                      },
+                      "val": {
+                        "bool": true
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "members"
+                      },
+                      "val": {
+                        "vec": []
+                      }
+                    },
+                    {
+                      "key": {
                         "symbol": "name"
                       },
                       "val": {

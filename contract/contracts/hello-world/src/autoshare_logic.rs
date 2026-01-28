@@ -1,7 +1,7 @@
 use crate::base::errors::Error;
 use crate::base::events::{
-    emit_autoshare_updated, emit_contract_paused, emit_contract_unpaused,
-    emit_group_activated, emit_group_deactivated,
+    emit_autoshare_updated, emit_contract_paused, emit_contract_unpaused, emit_group_activated,
+    emit_group_deactivated,
 };
 use crate::base::types::{AutoShareDetails, GroupMember, PaymentHistory};
 use soroban_sdk::{contracttype, token, Address, BytesN, Env, String, Vec};
@@ -28,6 +28,11 @@ pub fn create_autoshare(
     payment_token: Address,
 ) -> Result<(), Error> {
     creator.require_auth();
+
+    // Check if contract is paused
+    if get_paused_status(&env) {
+        return Err(Error::ContractPaused);
+    }
 
     let key = DataKey::AutoShare(id.clone());
 
@@ -169,7 +174,17 @@ pub fn get_group_members(env: Env, id: BytesN<32>) -> Result<Vec<GroupMember>, E
     Ok(members)
 }
 
-pub fn add_group_member(env: Env, id: BytesN<32>, address: Address, percentage: u32) -> Result<(), Error> {
+pub fn add_group_member(
+    env: Env,
+    id: BytesN<32>,
+    address: Address,
+    percentage: u32,
+) -> Result<(), Error> {
+    // Check if contract is paused
+    if get_paused_status(&env) {
+        return Err(Error::ContractPaused);
+    }
+
     // First check if the group exists
     let group_key = DataKey::AutoShare(id.clone());
     if !env.storage().persistent().has(&group_key) {
@@ -190,7 +205,10 @@ pub fn add_group_member(env: Env, id: BytesN<32>, address: Address, percentage: 
         }
     }
 
-    members.push_back(GroupMember { address, percentage });
+    members.push_back(GroupMember {
+        address,
+        percentage,
+    });
     env.storage().persistent().set(&members_key, &members);
     Ok(())
 }
