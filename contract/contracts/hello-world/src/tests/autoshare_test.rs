@@ -648,11 +648,12 @@ fn test_reduce_usage_non_existent_group_fails() {
 #[test]
 fn test_initialize_with_admin() {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register(AutoShareContract, ());
     let client = AutoShareContractClient::new(&env, &contract_id);
 
     let admin = Address::generate(&env);
-    client.initialize(&admin);
+    client.initialize_admin(&admin);
 
     let retrieved_admin = client.get_admin();
     assert_eq!(retrieved_admin, admin);
@@ -661,11 +662,12 @@ fn test_initialize_with_admin() {
 #[test]
 fn test_get_admin() {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register(AutoShareContract, ());
     let client = AutoShareContractClient::new(&env, &contract_id);
 
     let admin = Address::generate(&env);
-    client.initialize(&admin);
+    client.initialize_admin(&admin);
 
     let result = client.get_admin();
     assert_eq!(result, admin);
@@ -681,7 +683,7 @@ fn test_transfer_admin() {
     let old_admin = Address::generate(&env);
     let new_admin = Address::generate(&env);
 
-    client.initialize(&old_admin);
+    client.initialize_admin(&old_admin);
     client.transfer_admin(&old_admin, &new_admin);
 
     let current_admin = client.get_admin();
@@ -700,7 +702,7 @@ fn test_transfer_admin_unauthorized() {
     let non_admin = Address::generate(&env);
     let new_admin = Address::generate(&env);
 
-    client.initialize(&admin);
+    client.initialize_admin(&admin);
     client.transfer_admin(&non_admin, &new_admin);
 }
 
@@ -712,7 +714,7 @@ fn test_admin_can_pause() {
     let client = AutoShareContractClient::new(&env, &contract_id);
 
     let admin = Address::generate(&env);
-    client.initialize(&admin);
+    client.initialize_admin(&admin);
 
     client.pause(&admin);
     assert!(client.get_paused_status());
@@ -726,7 +728,7 @@ fn test_admin_can_unpause() {
     let client = AutoShareContractClient::new(&env, &contract_id);
 
     let admin = Address::generate(&env);
-    client.initialize(&admin);
+    client.initialize_admin(&admin);
 
     client.pause(&admin);
     assert!(client.get_paused_status());
@@ -748,7 +750,7 @@ fn test_get_contract_balance() {
     let client = AutoShareContractClient::new(&env, &contract_id);
 
     let admin = Address::generate(&env);
-    client.initialize(&admin);
+    client.initialize_admin(&admin);
 
     // Create and initialize token
     let token_id = env.register(MockToken, ());
@@ -778,7 +780,7 @@ fn test_admin_can_withdraw() {
 
     let admin = Address::generate(&env);
     let recipient = Address::generate(&env);
-    client.initialize(&admin);
+    client.initialize_admin(&admin);
 
     // Create and initialize token
     let token_id = env.register(MockToken, ());
@@ -816,7 +818,7 @@ fn test_non_admin_cannot_withdraw() {
     let admin = Address::generate(&env);
     let non_admin = Address::generate(&env);
     let recipient = Address::generate(&env);
-    client.initialize(&admin);
+    client.initialize_admin(&admin);
 
     // Create and initialize token
     let token_id = env.register(MockToken, ());
@@ -846,7 +848,7 @@ fn test_withdraw_insufficient_balance() {
 
     let admin = Address::generate(&env);
     let recipient = Address::generate(&env);
-    client.initialize(&admin);
+    client.initialize_admin(&admin);
 
     // Create and initialize token
     let token_id = env.register(MockToken, ());
@@ -876,7 +878,7 @@ fn test_withdraw_zero_amount() {
 
     let admin = Address::generate(&env);
     let recipient = Address::generate(&env);
-    client.initialize(&admin);
+    client.initialize_admin(&admin);
 
     // Create and initialize token
     let token_id = env.register(MockToken, ());
@@ -906,7 +908,7 @@ fn test_withdraw_negative_amount() {
 
     let admin = Address::generate(&env);
     let recipient = Address::generate(&env);
-    client.initialize(&admin);
+    client.initialize_admin(&admin);
 
     // Create and initialize token
     let token_id = env.register(MockToken, ());
@@ -937,7 +939,7 @@ fn test_admin_functions_after_transfer() {
     let new_admin = Address::generate(&env);
     let recipient = Address::generate(&env);
 
-    client.initialize(&old_admin);
+    client.initialize_admin(&old_admin);
     client.transfer_admin(&old_admin, &new_admin);
 
     // Create and initialize token
@@ -973,7 +975,7 @@ fn test_old_admin_cannot_withdraw_after_transfer() {
     let new_admin = Address::generate(&env);
     let recipient = Address::generate(&env);
 
-    client.initialize(&old_admin);
+    client.initialize_admin(&old_admin);
     client.transfer_admin(&old_admin, &new_admin);
 
     // Create and initialize token
