@@ -24,4 +24,5 @@ pub enum Error {
     GroupInactive = 18,
     GroupAlreadyActive = 19,
     GroupAlreadyInactive = 20,
+    InsufficientContractBalance = 21,
 }

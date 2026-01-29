@@ -454,6 +454,14 @@
                           "val": {
                             "u32": 33
                           }
+                        },
+                        {
+                          "key": {
+                            "symbol": "percentage"
+                          },
+                          "val": {
+                            "u32": 0
+                          }
                         }
                       ]
                     },
@@ -473,6 +481,14 @@
                           },
                           "val": {
                             "u32": 33
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "percentage"
+                          },
+                          "val": {
+                            "u32": 0
                           }
                         }
                       ]
@@ -755,6 +771,14 @@
                           },
                           "val": {
                             "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK3IM"
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "percentage"
+                          },
+                          "val": {
+                            "u32": 0
                           }
                         }
                       ]
