@@ -1,6 +1,9 @@
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+
 use crate::base::types::GroupMember;
 use crate::{AutoShareContract, AutoShareContractClient};
-use soroban_sdk::{testutils::Address as _, token, Address, BytesN, Env, String, Vec};
+use soroban_sdk::{testutils::Address as _, token, Address, BytesN, Env, String};
 
 fn create_token_contract<'a>(
     env: &Env,

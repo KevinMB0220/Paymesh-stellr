@@ -1,3 +1,6 @@
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+
 use crate::base::types::GroupMember;
 use crate::mock_token::{MockToken, MockTokenClient};
 use crate::{AutoShareContract, AutoShareContractClient};
