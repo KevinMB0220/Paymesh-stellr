@@ -1,7 +1,7 @@
 use crate::base::errors::Error;
 use crate::base::events::{
-    emit_admin_transferred, emit_autoshare_updated, emit_contract_paused,
-    emit_contract_unpaused, emit_group_activated, emit_group_deactivated, emit_withdrawal,
+    emit_admin_transferred, emit_autoshare_updated, emit_contract_paused, emit_contract_unpaused,
+    emit_group_activated, emit_group_deactivated, emit_withdrawal,
 };
 use crate::base::types::{AutoShareDetails, GroupMember, PaymentHistory};
 use soroban_sdk::{contracttype, token, Address, BytesN, Env, String, Vec};
