@@ -10,14 +10,13 @@ fn create_helper(
     name: &String,
     creator: &Address,
     members: &Vec<GroupMember>,
-    test_env: &crate::test_utils::TestEnv
+    test_env: &crate::test_utils::TestEnv,
 ) {
     let token = test_env.mock_tokens.get(0).unwrap().clone();
     crate::test_utils::mint_tokens(&test_env.env, &token, creator, 10000000);
     client.create(id, name, creator, &1u32, &token);
     client.update_members(id, creator, members);
 }
-
 
 #[test]
 fn test_create_and_get_success() {
@@ -1123,7 +1122,8 @@ fn test_is_group_member_works_on_inactive_group() {
 
 #[test]
 fn test_initialize_with_admin() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register(AutoShareContract, ());
     let client = AutoShareContractClient::new(&env, &contract_id);
 
@@ -1136,7 +1136,8 @@ fn test_initialize_with_admin() {
 
 #[test]
 fn test_get_admin() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register(AutoShareContract, ());
     let client = AutoShareContractClient::new(&env, &contract_id);
 
@@ -1149,7 +1150,8 @@ fn test_get_admin() {
 
 #[test]
 fn test_transfer_admin() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     env.mock_all_auths();
     let contract_id = env.register(AutoShareContract, ());
     let client = AutoShareContractClient::new(&env, &contract_id);
@@ -1167,7 +1169,8 @@ fn test_transfer_admin() {
 #[test]
 #[should_panic]
 fn test_transfer_admin_unauthorized() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     env.mock_all_auths();
     let contract_id = env.register(AutoShareContract, ());
     let client = AutoShareContractClient::new(&env, &contract_id);
@@ -1182,7 +1185,8 @@ fn test_transfer_admin_unauthorized() {
 
 #[test]
 fn test_admin_can_pause() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     env.mock_all_auths();
     let contract_id = env.register(AutoShareContract, ());
     let client = AutoShareContractClient::new(&env, &contract_id);
@@ -1196,7 +1200,8 @@ fn test_admin_can_pause() {
 
 #[test]
 fn test_admin_can_unpause() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     env.mock_all_auths();
     let contract_id = env.register(AutoShareContract, ());
     let client = AutoShareContractClient::new(&env, &contract_id);
@@ -1217,7 +1222,8 @@ fn test_admin_can_unpause() {
 
 #[test]
 fn test_get_contract_balance() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     env.mock_all_auths();
 
     let contract_id = env.register(AutoShareContract, ());
@@ -1246,7 +1252,8 @@ fn test_get_contract_balance() {
 
 #[test]
 fn test_admin_can_withdraw() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     env.mock_all_auths();
 
     let contract_id = env.register(AutoShareContract, ());
@@ -1283,7 +1290,8 @@ fn test_admin_can_withdraw() {
 #[test]
 #[should_panic]
 fn test_non_admin_cannot_withdraw() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     env.mock_all_auths();
 
     let contract_id = env.register(AutoShareContract, ());
@@ -1314,7 +1322,8 @@ fn test_non_admin_cannot_withdraw() {
 #[test]
 #[should_panic]
 fn test_withdraw_insufficient_balance() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     env.mock_all_auths();
 
     let contract_id = env.register(AutoShareContract, ());
@@ -1344,7 +1353,8 @@ fn test_withdraw_insufficient_balance() {
 #[test]
 #[should_panic]
 fn test_withdraw_zero_amount() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     env.mock_all_auths();
 
     let contract_id = env.register(AutoShareContract, ());
@@ -1374,7 +1384,8 @@ fn test_withdraw_zero_amount() {
 #[test]
 #[should_panic]
 fn test_withdraw_negative_amount() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     env.mock_all_auths();
 
     let contract_id = env.register(AutoShareContract, ());
@@ -1403,7 +1414,8 @@ fn test_withdraw_negative_amount() {
 
 #[test]
 fn test_admin_functions_after_transfer() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     env.mock_all_auths();
 
     let contract_id = env.register(AutoShareContract, ());
@@ -1439,7 +1451,8 @@ fn test_admin_functions_after_transfer() {
 #[test]
 #[should_panic]
 fn test_old_admin_cannot_withdraw_after_transfer() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     env.mock_all_auths();
 
     let contract_id = env.register(AutoShareContract, ());
@@ -1475,7 +1488,8 @@ fn test_old_admin_cannot_withdraw_after_transfer() {
 
 #[test]
 fn test_admin_initialization() {
-    let env = Env::default(); env.mock_all_auths();
+    let env = Env::default();
+    env.mock_all_auths();
     env.mock_all_auths();
     let contract_id = env.register(AutoShareContract, ());
     let client = AutoShareContractClient::new(&env, &contract_id);
@@ -1516,7 +1530,7 @@ fn test_add_duplicate_token_fails() {
     let test_env = setup_test_env();
     let client = AutoShareContractClient::new(&test_env.env, &test_env.autoshare_contract);
     client.initialize_admin(&test_env.admin);
-    
+
     let token_address = test_env.mock_tokens.get(0).unwrap().clone();
     // client.add_supported_token(&token_address, &test_env.admin);
     client.add_supported_token(&token_address, &test_env.admin);
@@ -1527,7 +1541,7 @@ fn test_remove_supported_token() {
     let test_env = setup_test_env();
     let client = AutoShareContractClient::new(&test_env.env, &test_env.autoshare_contract);
     client.initialize_admin(&test_env.admin);
-    
+
     let token_address = test_env.mock_tokens.get(0).unwrap().clone();
     // client.add_supported_token(&token_address, &test_env.admin);
 
@@ -1582,7 +1596,7 @@ fn test_create_group_with_payment() {
 
     let creator = test_env.users.get(0).unwrap().clone();
     let token_address = test_env.mock_tokens.get(0).unwrap().clone();
-    
+
     // client.add_supported_token(&token_address, &test_env.admin);
 
     crate::test_utils::mint_tokens(&test_env.env, &token_address, &creator, 10_000_000);

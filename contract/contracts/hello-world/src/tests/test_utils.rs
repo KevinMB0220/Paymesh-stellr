@@ -144,7 +144,7 @@ pub fn create_test_group(
     let name = String::from_str(env, "Test Group");
 
     client.create(&id, &name, creator, &usages, token);
-    
+
     if !members.is_empty() {
         client.update_members(&id, creator, members);
     }

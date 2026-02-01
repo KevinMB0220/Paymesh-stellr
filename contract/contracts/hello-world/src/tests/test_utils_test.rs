@@ -61,14 +61,7 @@ fn test_autoshare_helpers() {
         percentage: 100,
     });
 
-    let group_id = create_test_group(
-        &env,
-        &contract,
-        &creator,
-        &members,
-        1,
-        &token,
-    );
+    let group_id = create_test_group(&env, &contract, &creator, &members, 1, &token);
 
     assert_group_exists(&env, &contract, &group_id);
 }
