@@ -9,13 +9,13 @@ use soroban_sdk::{contracttype, token, Address, BytesN, Env, String, Vec};
 #[contracttype]
 pub enum DataKey {
     AutoShare(BytesN<32>),
-    GroupMembers(BytesN<32>),
     AllGroups,
     Admin,
     SupportedTokens,
     UsageFee,
     UserPaymentHistory(Address),
     GroupPaymentHistory(BytesN<32>),
+    GroupMembers(BytesN<32>),
     IsPaused,
 }
 
@@ -158,20 +158,8 @@ pub fn is_group_member(env: Env, id: BytesN<32>, address: Address) -> Result<boo
 }
 
 pub fn get_group_members(env: Env, id: BytesN<32>) -> Result<Vec<GroupMember>, Error> {
-    // First check if the group exists
-    let group_key = DataKey::AutoShare(id.clone());
-    if !env.storage().persistent().has(&group_key) {
-        return Err(Error::NotFound);
-    }
-
-    let members_key = DataKey::GroupMembers(id);
-    let members: Vec<GroupMember> = env
-        .storage()
-        .persistent()
-        .get(&members_key)
-        .unwrap_or(Vec::new(&env));
-
-    Ok(members)
+    let details = get_autoshare(env, id)?;
+    Ok(details.members)
 }
 
 pub fn add_group_member(
@@ -185,31 +173,31 @@ pub fn add_group_member(
         return Err(Error::ContractPaused);
     }
 
-    // First check if the group exists
-    let group_key = DataKey::AutoShare(id.clone());
-    if !env.storage().persistent().has(&group_key) {
-        return Err(Error::NotFound);
-    }
-
-    let members_key = DataKey::GroupMembers(id);
-    let mut members: Vec<GroupMember> = env
+    let key = DataKey::AutoShare(id.clone());
+    let mut details: AutoShareDetails = env
         .storage()
         .persistent()
-        .get(&members_key)
-        .unwrap_or(Vec::new(&env));
+        .get(&key)
+        .ok_or(Error::NotFound)?;
 
     // Check if already a member
-    for member in members.iter() {
+    for member in details.members.iter() {
         if member.address == address {
             return Err(Error::AlreadyExists);
         }
     }
 
-    members.push_back(GroupMember {
+    // Add new member
+    details.members.push_back(GroupMember {
         address,
         percentage,
     });
-    env.storage().persistent().set(&members_key, &members);
+
+    // Validate total percentage after adding
+    validate_members(&details.members)?;
+
+    // Save updated details
+    env.storage().persistent().set(&key, &details);
     Ok(())
 }
 
@@ -579,6 +567,10 @@ pub fn update_members(
         return Err(Error::Unauthorized);
     }
 
+    if !details.is_active {
+        return Err(Error::GroupInactive);
+    }
+
     // Validate new members
     if new_members.is_empty() {
         return Err(Error::EmptyMembers);
@@ -702,5 +694,29 @@ pub fn withdraw(
     client.transfer(&env.current_contract_address(), &recipient, &amount);
 
     emit_withdrawal(&env, token, amount, recipient);
+    Ok(())
+}
+
+fn validate_members(members: &Vec<GroupMember>) -> Result<(), Error> {
+    if members.is_empty() {
+        return Err(Error::EmptyMembers);
+    }
+    let env = members.env();
+    let mut total_percentage: u32 = 0;
+    let mut seen_addresses = Vec::new(env);
+
+    for member in members.iter() {
+        total_percentage += member.percentage;
+        for seen in seen_addresses.iter() {
+            if seen == member.address {
+                return Err(Error::DuplicateMember);
+            }
+        }
+        seen_addresses.push_back(member.address.clone());
+    }
+
+    if total_percentage != 100 {
+        return Err(Error::InvalidTotalPercentage);
+    }
     Ok(())
 }
